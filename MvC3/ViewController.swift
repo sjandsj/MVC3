@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var cityTextField: UITextField!
@@ -21,11 +21,12 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         configureRetunKey()
         configureTapGesture()
-        appendindToDataModel()
+        appendingToDataModel()
+        tableView.delegate = self
     }
     
-    func appendindToDataModel() {
-        for i in 0...(array.count-1){
+    func appendingToDataModel() {
+        for i in 0...(array.count-1) {
             let dict = array[i]
             self.throughDataModels.append(DataModels(goodName: dict["name"] ?? "", yourCity: dict["address"] ?? ""))
         }
@@ -55,22 +56,34 @@ class ViewController: UIViewController {
             nameTextField.text=""
             cityTextField.text=""
         }
+        else if(((nameTextField.text?.isEmpty == true) && (cityTextField.text?.isEmpty == false))) {
+            createAlert(title: "No Name Found", message: "Please Enter Name")
+        }
+        else if(((nameTextField.text?.isEmpty == false) && (cityTextField.text?.isEmpty == true))) {
+            createAlert(title: "No City Found", message: "Please Enter City")
+        }
         else {
-            return
+            createAlert(title: "No Input", message: "Please Enter Both The Inputs")
         }
     }
-}
-
-extension ViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        nameTextField.resignFirstResponder()
-        cityTextField.resignFirstResponder()
-        return true
-    }
-}
-
-extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
+    func createAlert(title:String, message:String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle:UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "OK", style:UIAlertActionStyle.default, handler: {(action) in alert.dismiss(animated: true, completion: nil)
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    func createAlert2(title:String, message:String,indexPath: IndexPath) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle:UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Yes", style:UIAlertActionStyle.default, handler: {(action) in alert.dismiss(animated: true, completion: nil)
+            self.array.remove(at: indexPath.row)
+            self.tableView.deleteRows(at: [indexPath], with: .fade)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style:UIAlertActionStyle.default, handler: {(action) in alert.dismiss(animated: true, completion: nil)
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return throughDataModels.count
     }
@@ -83,7 +96,53 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    //    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    //        createAlert2(title: "delete", message: "delete it?????", indexPath: indexPath)
+    //    }
+//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        print("=========")
+//    }
+//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        // Do here
+//    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+    }
+
+    
 }
+
+extension ViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        nameTextField.resignFirstResponder()
+        cityTextField.resignFirstResponder()
+        return true
+    }
+}
+
+//extension ViewController: UITableViewDelegate, UITableViewDataSource {
+//
+//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//        return throughDataModels.count
+//    }
+//
+//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell:TableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell") as! TableViewCell
+//        let model:DataModels = throughDataModels[indexPath.row]
+//        cell.nameLabel.text = model.name
+//        cell.cityLabel.text = model.City
+//        return cell
+//    }
+//
+////    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+////        createAlert2(title: "delete", message: "delete it?????", indexPath: indexPath)
+////    }
+//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        print("=========")
+//    }
+//
+//
+//}
 
 
 
